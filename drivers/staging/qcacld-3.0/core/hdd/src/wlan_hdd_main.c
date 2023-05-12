@@ -216,9 +216,7 @@ static unsigned int dev_num = 1;
 static struct cdev wlan_hdd_state_cdev;
 static struct class *class;
 static dev_t device;
-static bool hdd_loaded = false;
-
-#if 0
+#ifndef MODULE
 static struct gwlan_loader *wlan_loader;
 static ssize_t wlan_boot_cb(struct kobject *kobj,
 			    struct kobj_attribute *attr,
@@ -8411,6 +8409,32 @@ out:
 }
 
 /**
+ * hdd_rx_wake_lock_destroy() - Destroy RX wakelock
+ * @hdd_ctx:	HDD context.
+ *
+ * Destroy RX wakelock.
+ *
+ * Return: None.
+ */
+static void hdd_rx_wake_lock_destroy(struct hdd_context *hdd_ctx)
+{
+	qdf_wake_lock_destroy(&hdd_ctx->rx_wake_lock);
+}
+
+/**
+ * hdd_rx_wake_lock_create() - Create RX wakelock
+ * @hdd_ctx:	HDD context.
+ *
+ * Create RX wakelock.
+ *
+ * Return: None.
+ */
+static void hdd_rx_wake_lock_create(struct hdd_context *hdd_ctx)
+{
+	qdf_wake_lock_create(&hdd_ctx->rx_wake_lock, "qcom_rx_wakelock");
+}
+
+/**
  * hdd_context_deinit() - Deinitialize HDD context
  * @hdd_ctx:    HDD context.
  *
@@ -8427,6 +8451,8 @@ static int hdd_context_deinit(struct hdd_context *hdd_ctx)
 	wlan_hdd_cfg80211_deinit(hdd_ctx->wiphy);
 
 	hdd_sap_context_destroy(hdd_ctx);
+
+	hdd_rx_wake_lock_destroy(hdd_ctx);
 
 	hdd_scan_context_destroy(hdd_ctx);
 
@@ -8540,9 +8566,7 @@ void hdd_wlan_exit(struct hdd_context *hdd_ctx)
 	hdd_wlan_stop_modules(hdd_ctx, false);
 
 	hdd_driver_memdump_deinit();
-	#ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_deinit();
-        #endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+
 	qdf_nbuf_deinit_replenish_timer();
 
 	if (QDF_GLOBAL_MONITOR_MODE ==  hdd_get_conparam()) {
@@ -10810,6 +10834,8 @@ static int hdd_context_init(struct hdd_context *hdd_ctx)
 	if (ret)
 		goto list_destroy;
 
+	hdd_rx_wake_lock_create(hdd_ctx);
+
 	ret = hdd_sap_context_init(hdd_ctx);
 	if (ret)
 		goto scan_destroy;
@@ -10833,6 +10859,7 @@ sap_destroy:
 
 scan_destroy:
 	hdd_scan_context_destroy(hdd_ctx);
+	hdd_rx_wake_lock_destroy(hdd_ctx);
 list_destroy:
 	qdf_list_destroy(&hdd_ctx->hdd_adapters);
 
@@ -12137,16 +12164,6 @@ static int hdd_initialize_mac_address(struct hdd_context *hdd_ctx)
 
 	/* Use fw provided MAC */
 	if (!qdf_is_macaddr_zero(&hdd_ctx->hw_macaddr)) {
-		#ifdef OPLUS_FEATURE_WIFI_MAC
-		if (hdd_ctx->hw_macaddr.bytes[0] & 0x01) {
-			uint8_t opbytes[QDF_MAC_ADDR_SIZE];
-			int8_t ii;
-			for (ii = 0; ii < QDF_MAC_ADDR_SIZE; ++ii) {
-				opbytes[ii] = hdd_ctx->hw_macaddr.bytes[QDF_MAC_ADDR_SIZE - 1 - ii];
-			}
-			qdf_mem_copy(hdd_ctx->hw_macaddr.bytes, opbytes, QDF_MAC_ADDR_SIZE);
-		}
-		#endif /* OPLUS_FEATURE_WIFI_MAC */
 		hdd_update_macaddr(hdd_ctx, hdd_ctx->hw_macaddr, false);
 		update_mac_addr_to_fw = false;
 		return 0;
@@ -13782,9 +13799,7 @@ int hdd_wlan_startup(struct hdd_context *hdd_ctx)
 
 	osif_request_manager_init();
 	hdd_driver_memdump_init();
-        #ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_init();
-        #endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+
 	hdd_dp_trace_init(hdd_ctx->config);
 
 	errno = hdd_wlan_start_modules(hdd_ctx, false);
@@ -13851,9 +13866,6 @@ stop_modules:
 	hdd_wlan_stop_modules(hdd_ctx, false);
 
 memdump_deinit:
-        #ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_deinit();
-	#endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
 	hdd_driver_memdump_deinit();
 	osif_request_manager_deinit();
 	qdf_nbuf_deinit_replenish_timer();
@@ -14942,7 +14954,6 @@ void hdd_init_start_completion(void)
 	INIT_COMPLETION(wlan_start_comp);
 }
 
-static int hdd_driver_load(void);
 static ssize_t wlan_hdd_state_ctrl_param_write(struct file *filp,
 						const char __user *user_buf,
 						size_t count,
@@ -14972,13 +14983,6 @@ static ssize_t wlan_hdd_state_ctrl_param_write(struct file *filp,
 	if (strncmp(buf, wlan_on_str, strlen(wlan_on_str)) != 0) {
 		pr_err("Invalid value received from framework");
 		goto exit;
-	}
-
-	if (!hdd_loaded) {
-		if (hdd_driver_load()) {
-			pr_err("%s: Failed to init hdd module\n", __func__);
-			goto exit;
-		}
 	}
 
 	if (!cds_is_driver_loaded() || cds_is_driver_recovering()) {
@@ -15838,10 +15842,16 @@ static int hdd_driver_load(void)
 
 	hdd_set_conparam(con_mode);
 
+	errno = wlan_hdd_state_ctrl_param_create();
+	if (errno) {
+		hdd_err("Failed to create ctrl param; errno:%d", errno);
+		goto wakelock_destroy;
+	}
+
 	errno = pld_init();
 	if (errno) {
 		hdd_err("Failed to init PLD; errno:%d", errno);
-		goto wakelock_destroy;
+		goto param_destroy;
 	}
 
 	hdd_driver_mode_change_register();
@@ -15856,7 +15866,6 @@ static int hdd_driver_load(void)
 		goto pld_deinit;
 	}
 
-	hdd_loaded = true;
 	hdd_debug("%s: driver loaded", WLAN_MODULE_NAME);
 
 	return 0;
@@ -15875,6 +15884,8 @@ pld_deinit:
 	/* Wait for any ref taken on /dev/wlan to be released */
 	while (qdf_atomic_read(&wlan_hdd_state_fops_ref))
 		;
+param_destroy:
+	wlan_hdd_state_ctrl_param_destroy();
 wakelock_destroy:
 	qdf_wake_lock_destroy(&wlan_wake_lock);
 comp_deinit:
@@ -15980,7 +15991,7 @@ static void hdd_driver_unload(void)
 	hdd_qdf_deinit();
 }
 
-#if 0
+#ifndef MODULE
 /**
  * wlan_boot_cb() - Wlan boot callback
  * @kobj:      object whose directory we're creating the link in.
@@ -16106,6 +16117,7 @@ static int wlan_deinit_sysfs(void)
 
 #endif /* MODULE */
 
+#ifdef MODULE
 /**
  * hdd_module_init() - Module init helper
  *
@@ -16115,15 +16127,26 @@ static int wlan_deinit_sysfs(void)
  */
 static int hdd_module_init(void)
 {
-	int ret;
+	if (hdd_driver_load())
+		return -EINVAL;
 
-	ret = wlan_hdd_state_ctrl_param_create();
+	return 0;
+}
+#else
+static int __init hdd_module_init(void)
+{
+	int ret = -EINVAL;
+
+	ret = wlan_init_sysfs();
 	if (ret)
-		pr_err("wlan_hdd_state_create:%x\n", ret);
+		hdd_err("Failed to create sysfs entry");
 
 	return ret;
 }
+#endif
 
+
+#ifdef MODULE
 /**
  * hdd_module_exit() - Exit function
  *
@@ -16135,6 +16158,13 @@ static void __exit hdd_module_exit(void)
 {
 	hdd_driver_unload();
 }
+#else
+static void __exit hdd_module_exit(void)
+{
+	hdd_driver_unload();
+	wlan_deinit_sysfs();
+}
+#endif
 
 static int fwpath_changed_handler(const char *kmessage,
 				  const struct kernel_param *kp)

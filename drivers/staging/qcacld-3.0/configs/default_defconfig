@@ -102,6 +102,7 @@ ifeq ($(CONFIG_ICNSS), y)
 	CONFIG_HELIUMPLUS := y
 	CONFIG_64BIT_PADDR := y
 	CONFIG_FEATURE_TSO := y
+	CONFIG_FEATURE_TSO_DEBUG := y
 	ifeq ($(CONFIG_INET_LRO), y)
 		CONFIG_WLAN_LRO := y
 	else
@@ -111,7 +112,7 @@ endif
 
 ifneq ($(DEVELOPER_DISABLE_BUILD_TIMESTAMP), y)
 ifneq ($(WLAN_DISABLE_BUILD_TAG), y)
-CONFIG_BUILD_TAG := n
+CONFIG_BUILD_TAG := y
 endif
 endif
 
@@ -164,6 +165,7 @@ ifneq ($(CONFIG_MOBILE_ROUTER), y)
 CONFIG_QCOM_TDLS := y
 
 CONFIG_WLAN_SYSFS := y
+CONFIG_WLAN_POWER_DEBUG := y
 #Enable Beacon Reception Stats
 CONFIG_FEATURE_BECN_STATS := y
 endif
@@ -450,6 +452,7 @@ CONFIG_DELIVERY_TO_STACK_STATUS_CHECK := y
 
 ifeq ($(CONFIG_FEATURE_TSO), y)
 	CONFIG_FEATURE_TSO_STATS := y
+	CONFIG_TSO_DEBUG_LOG_ENABLE := y
 endif
 
 ifeq ($(CONFIG_DISABLE_DP_STATS), y)
@@ -526,6 +529,9 @@ CONFIG_WLAN_LOG_FATAL := y
 CONFIG_WLAN_LOG_ERROR := y
 CONFIG_WLAN_LOG_WARN := y
 CONFIG_WLAN_LOG_INFO := y
+CONFIG_WLAN_LOG_DEBUG := y
+CONFIG_WLAN_LOG_ENTER := y
+CONFIG_WLAN_LOG_EXIT := y
 
 #Enable OL debug and wmi unified functions
 CONFIG_ATH_PERF_PWR_OFFLOAD := y
@@ -594,10 +600,6 @@ endif
 ifeq ($(CONFIG_ARCH_QCS40X), y)
 CONFIG_FEATURE_WLAN_STA_4ADDR_SCHEME := y
 endif
-
-#ifdef OPLUS_ARCH_INJECT
-    CONFIG_WLAN_DEBUG_CRASH_INJECT := y
-#endif /* OPLUS_ARCH_INJECT */
 
 #Enable power management suspend/resume functionality to PCI
 CONFIG_ATH_BUS_PM := y
@@ -784,11 +786,20 @@ CONFIG_FEATURE_HTC_CREDIT_HISTORY := y
 #Flag to enable MTRACE feature
 CONFIG_TRACE_RECORD_FEATURE := y
 
+#Flag to enable p2p debug feature
+CONFIG_WLAN_FEATURE_P2P_DEBUG := y
+
+#Flag to enable roam debug log
+CONFIG_FEATURE_ROAM_DEBUG := y
+
 #Flag to enable DFS Master feature
 CONFIG_WLAN_DFS_MASTER_ENABLE := y
 
 #Flag to enable WEXT support for STA/AP/P2P interfaces
 CONFIG_WLAN_WEXT_SUPPORT_ENABLE := y
+
+#Flag to enable/disable MTRACE feature
+CONFIG_ENABLE_MTRACE_LOG := y
 
 #Flag to enable nud tracking feature
 CONFIG_WLAN_NUD_TRACKING := y
@@ -831,6 +842,9 @@ CONFIG_FEATURE_INTEROP_ISSUES_AP := y
 CONFIG_FEATURE_WLAN_WAPI := y
 
 CONFIG_AGEIE_ON_SCAN_RESULTS := y
+
+#Flag to enable FW log parsing support feature
+CONFIG_FEATURE_FW_LOG_PARSING := y
 
 CONFIG_PTT_SOCK_SVC_ENABLE := y
 CONFIG_SOFTAP_CHANNEL_RANGE := y
@@ -925,6 +939,7 @@ ifeq ($(CONFIG_LITHIUM), y)
 		CONFIG_ALLOW_PKT_DROPPING := y
 	endif
 	CONFIG_DYNAMIC_RX_AGGREGATION := y
+	CONFIG_RX_DESC_DEBUG_CHECK:= y
 	CONFIG_WLAN_SUPPORT_DATA_STALL := y
 	CONFIG_WLAN_DP_PER_RING_TYPE_CONFIG := y
 	CONFIG_WLAN_CE_INTERRUPT_THRESHOLD_CONFIG := y
@@ -933,11 +948,8 @@ ifeq ($(CONFIG_LITHIUM), y)
 	CONFIG_WLAN_DP_PENDING_MEM_FLUSH := y
 endif
 
-#Enable Desc Debug Check
-CONFIG_RX_DESC_DEBUG_CHECK:= y
-
-#Enable Power Debug
-CONFIG_WLAN_POWER_DEBUG := y
+#Flag to enable hdd memory dump feature
+CONFIG_FEATURE_MEMDUMP_ENABLE := y
 
 #Flag to enable/disable WLAN D0-WOW
 ifeq ($(CONFIG_PCI_MSM), y)

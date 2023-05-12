@@ -6,9 +6,6 @@ else
 	KERNEL_BUILD := n
 endif
 
-# Force user build
-TARGET_BUILD_VARIANT := user
-
 ifeq ($(KERNEL_BUILD), y)
 	# These are provided in external module based builds
 	# Need to explicitly define for Kernel-based builds
@@ -48,7 +45,7 @@ include $(WLAN_CFG_OVERRIDE_FILE)
 $(warning "Overriding WLAN config with: $(shell cat $(WLAN_CFG_OVERRIDE_FILE))")
 endif
 
-include $(WLAN_ROOT)/configs/$(patsubst "%",%,$(CONFIG_QCA_CLD_WLAN_PROFILE))_defconfig
+include $(WLAN_ROOT)/configs/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig
 
 ############ UAPI ############
 UAPI_DIR :=	uapi
@@ -87,19 +84,7 @@ HDD_OBJS := 	$(HDD_SRC_DIR)/wlan_hdd_assoc.o \
 		$(HDD_SRC_DIR)/wlan_hdd_trace.o \
 		$(HDD_SRC_DIR)/wlan_hdd_tx_rx.o \
 		$(HDD_SRC_DIR)/wlan_hdd_wmm.o \
-		$(HDD_SRC_DIR)/wlan_hdd_wowl.o \
-		$(HDD_SRC_DIR)/oplus_wlan_hdd_dual_sta.o
-
-ifeq ($(CONFIG_OPLUS_FEATURE_WIFI_OPLUSWFD), y)
-KBUILD_CPPFLAGS += -DOPLUS_FEATURE_WIFI_OPLUSWFD
-HDD_OBJS +=	$(HDD_SRC_DIR)/wlan_oplus_wfd.o
-endif
-
-ifeq ($(CONFIG_OPLUS_FEATURE_WIFI_OPLUSWFD), m)
-KBUILD_CPPFLAGS += -DOPLUS_FEATURE_WIFI_OPLUSWFD
-HDD_OBJS +=	$(HDD_SRC_DIR)/wlan_oplus_wfd.o
-endif
-### End
+		$(HDD_SRC_DIR)/wlan_hdd_wowl.o
 
 ifeq ($(CONFIG_WLAN_FEATURE_PERIODIC_STA_STATS), y)
 HDD_OBJS += $(HDD_SRC_DIR)/wlan_hdd_periodic_sta_stats.o
@@ -3285,6 +3270,16 @@ cppflags-$(CONFIG_SMMU_S1_UNMAP) += -DCONFIG_SMMU_S1_UNMAP
 
 KBUILD_CPPFLAGS += $(cppflags-y)
 
+# Currently, for versions of gcc which support it, the kernel Makefile
+# is disabling the maybe-uninitialized warning.  Re-enable it for the
+# WLAN driver.  Note that we must use ccflags-y here so that it
+# will override the kernel settings.
+ifeq ($(call cc-option-yn, -Wmaybe-uninitialized), y)
+ccflags-y += -Wmaybe-uninitialized
+ifneq (y,$(CONFIG_ARCH_MSM))
+ccflags-y += -Wframe-larger-than=4096
+endif
+endif
 ccflags-y += -Wmissing-prototypes
 
 ifeq ($(call cc-option-yn, -Wheader-guard), y)
