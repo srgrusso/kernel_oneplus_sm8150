@@ -114,3 +114,5 @@ obj-y               += oplus_nwpower/
 #ifdef OPLUS_FEATURE_WIFI_CAPCENTER
 obj-$(CONFIG_OPLUS_FEATURE_WIFI_CAPCENTER) += oplus_wificapcenter/
 #endif /* OPLUS_FEATURE_WIFI_CAPCENTER */
+
+obj-y                           += oplus_modules/
