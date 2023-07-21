@@ -24,6 +24,7 @@ enum {
 	CODEC_VENDOR_NXP = 0,
 	CODEC_VENDOR_MAXIM,
 	CODEC_VENDOR_AKM,
+	CODEC_VENDOR_AWINIC,
 	CODEC_VENDOR_END,
 	CODEC_VENDOR_MAX = CODEC_VENDOR_END,
 };
@@ -41,6 +42,7 @@ static const char *extend_codec_vendor[CODEC_VENDOR_MAX] = {
 	[CODEC_VENDOR_NXP] = "nxp",
 	[CODEC_VENDOR_MAXIM] = "maxim",
 	[CODEC_VENDOR_AKM] = "akm",
+	[CODEC_VENDOR_AWINIC] = "awinic",
 };
 
 static const char *extend_speaker_prop[CODEC_PROP_MAX] = {
@@ -256,6 +258,16 @@ static void extend_codec_be_dailink(struct codec_prop_info *codec_info, struct s
 			dailink[i2s_id*2].codec_name = codec_info->codec_name[0];
 			dailink[i2s_id*2].codec_dai_name = codec_info->codec_dai_name[0];
 			dailink[i2s_id*2].init = ak4376_audrx_init;
+		}
+	}
+
+	if (!strcmp(codec_info->codec_vendor, extend_codec_vendor[CODEC_VENDOR_AWINIC])) {
+		if (codec_info->dev_cnt == 1) {
+			if (soc_find_component(NULL, codec_info->codec_name[0])) {
+				pr_info("%s: use %s mono dailink replace\n", __func__, codec_info->codec_vendor);
+				dailink[i2s_id*2].codec_name = codec_info->codec_name[0];
+				dailink[i2s_id*2].codec_dai_name = codec_info->codec_dai_name[0];
+			}
 		}
 	}
 }
