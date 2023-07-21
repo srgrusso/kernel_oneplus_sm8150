@@ -18,7 +18,7 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/serio.h>
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 #include <soc/oplus/system/oplus_project.h>
 #include "oplus_motor/oplus_motor.h"
 #include "oplus_motor/oplus_motor_notifier.h"

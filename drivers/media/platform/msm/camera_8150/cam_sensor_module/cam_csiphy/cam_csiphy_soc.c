@@ -17,7 +17,7 @@
 #include "include/cam_csiphy_1_2_hwreg.h"
 #include "include/cam_csiphy_2_0_hwreg.h"
 #ifdef VENDOR_EDIT
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 #endif /* DBMDX_SOUND_TRIGGER_SUPPORT */
 
 #define CSIPHY_3PH_DIVISOR           16

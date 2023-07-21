@@ -23,7 +23,7 @@
 #include <soc/qcom/subsystem_notif.h>
 #ifdef OPLUS_BUG_STABILITY
 //Add for: disable wifi while power off charging because modem img will not mount
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 #endif /* OPLUS_BUG_STABILITY */
 
 #include "main.h"

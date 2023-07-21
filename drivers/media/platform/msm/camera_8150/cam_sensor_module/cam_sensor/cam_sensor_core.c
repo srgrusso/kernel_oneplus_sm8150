@@ -22,7 +22,7 @@
 #include "cam_common_util.h"
 #include "cam_packet_util.h"
 #ifdef VENDOR_EDIT
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 #endif /* DBMDX_SOUND_TRIGGER_SUPPORT */
 
 #ifdef VENDOR_EDIT

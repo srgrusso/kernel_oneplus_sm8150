@@ -39,7 +39,7 @@
 #include <linux/notifier.h>
 #include "oplus_display_private_api.h"
 #include "oplus_ffl.h"
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 extern int msm_drm_notifier_call_chain(unsigned long val, void *v);
 /* Don't panic if smmu fault*/
 extern int sde_kms_set_smmu_no_fatal_faults(struct drm_device *drm);

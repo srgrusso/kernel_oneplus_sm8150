@@ -36,7 +36,7 @@
 #include <soc/qcom/watchdog.h>
 #include <soc/qcom/minidump.h>
 #ifdef CONFIG_OPLUS_FEATURE_QCOM_MINIDUMP_ENHANCE
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 #include <soc/oplus/system/qcom_minidump_enhance.h>
 #endif
 

@@ -27,8 +27,8 @@
 
 #include <linux/of_gpio.h>
 #include <linux/gpio.h>
-#include <soc/oplus/boot_mode.h>
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/boot_mode.h>
+#include <soc/oplus/system/oplus_project.h>
 
 /* Registers */
 #define LM3697_REG_OUTPUT_CFG       0x10

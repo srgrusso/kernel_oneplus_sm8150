@@ -43,7 +43,7 @@
 #include "ak4376.h"
 
 #ifdef OPLUS_ARCH_EXTENDS
-//#include <soc/oplus/oplus_project.h>
+//#include <soc/oplus/system/oplus_project.h>
 #endif /* OPLUS_ARCH_EXTENDS */
 
 #define AK4376_DEBUG				//used at debug mode

@@ -27,7 +27,7 @@
 #include "dsi_parser.h"
 #include "sde_dbg.h"
 #ifdef OPLUS_BUG_STABILITY
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 #include "oplus_display_private_api.h"
 #include "oplus_dc_diming.h"
 #include "oplus_onscreenfingerprint.h"

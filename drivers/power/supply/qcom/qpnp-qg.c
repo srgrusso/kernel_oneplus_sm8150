@@ -46,7 +46,7 @@
 /* Yichun.Chen  PSW.BSP.CHG  2018-04-25  Add for OPLUS_CHARGE */
 #include "../../oplus/oplus_gauge.h"
 #include "../../oplus/oplus_charger.h"
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 #include <soc/oplus/device_info.h>
 #include <linux/delay.h>
 

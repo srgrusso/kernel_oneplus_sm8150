@@ -21,7 +21,7 @@
 #include <linux/project_info.h>
 #include <soc/oplus/device_info.h>
 
-#include <linux/oneplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 
 struct camera_vendor_match_tbl {
 	uint16_t sensor_id;

@@ -46,7 +46,7 @@
 #include <uapi/linux/qg.h>
 #endif
 #include <soc/oplus/device_info.h>
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 
 #include "../oplus_vooc.h"
 #include "../oplus_gauge.h"
@@ -55,7 +55,7 @@
 #include "oplus_chargepump.h"
 #include <oplus_nu1619.h>
 #include <oplus_nu1619_fw.h>
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 
 #define DEBUG_BY_FILE_OPS
 #define DEBUG_FASTCHG_BY_ADB

@@ -22,7 +22,7 @@
 #include <linux/mmc/sd.h>
 #ifdef VENDOR_EDIT
 #include <linux/string_helpers.h>
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 #endif /* VENDOR_EDIT */
 
 #include "core.h"

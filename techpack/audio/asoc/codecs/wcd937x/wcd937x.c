@@ -35,7 +35,7 @@
 
 #ifdef OPLUS_ARCH_EXTENDS
 #ifdef DBMDX_SOUND_TRIGGER_SUPPORT
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 #endif /* DBMDX_SOUND_TRIGGER_SUPPORT */
 #endif /* OPLUS_ARCH_EXTENDS */
 

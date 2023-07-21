@@ -54,7 +54,7 @@
 #include <sound/dbmdx-export.h>
 
 #ifdef OPLUS_ARCH_EXTENDS
-#include <soc/oplus/oplus_project.h>
+#include <soc/oplus/system/oplus_project.h>
 extern void dbmdx_enable_micbias(bool enable);
 struct dbmdx_private *g_dbmdx_pdata;
 #endif /* OPLUS_ARCH_EXTENDS */

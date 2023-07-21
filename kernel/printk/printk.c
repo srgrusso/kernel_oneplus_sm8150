@@ -65,7 +65,7 @@
 #endif
 
 #ifdef OPLUS_FEATURE_POWERINFO_FTM
-#include <soc/oplus/boot_mode.h>
+#include <soc/oplus/system/boot_mode.h>
 static bool __read_mostly printk_disable_uart = true; /*set true avoid early console output*/
 static int __init printk_uart_disabled(char *str)
 {
