@@ -76,13 +76,6 @@ config EROFS_FS_ZIP
 
 	  If you don't want to enable compression feature, say N.
 
-config OPLUS_FEATURE_EROFS
-	bool "EROFS oplus repo"
-	default y
-	depends on EROFS_FS
-	help
-	  define this config to switch oplus repo.
-	  
 config EROFS_FS_PCPU_KTHREAD
 	bool "EROFS per-cpu decompression kthread workers"
 	depends on EROFS_FS_ZIP
